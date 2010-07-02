@@ -1,9 +1,9 @@
 /*
 ---
 
-name: Sortables.js
+name: Drag.Sortable.js
 
-description: Drag and drop sorting of lists
+description: Improves the native sortables class
 
 license: MIT-style license.
 
@@ -11,9 +11,9 @@ author: Stian Didriksen <stian@nooku.org>
 
 copyright: Copyright needs to be Timble CVBA. (http://www.timble.net) All rights reserved.
 
-requires: [Class]
+requires: [Sortables]
 
-provides: Sortables
+provides: Drag.Sortable
 
 ...
 */
@@ -21,12 +21,8 @@ provides: Sortables
 Drag.Sortable = Sortables.extend({
 
 	options: {
-		url: '#',
-		onStart: Class.empty,
-		onComplete: Class.empty,
 		ghost: true,
 		revert: true,
-		snap: 3,
 		fx: {
 			duration: 300,
 			transition: Fx.Transitions.Sine.easeInOut,
@@ -43,16 +39,14 @@ Drag.Sortable = Sortables.extend({
 			//@TODO Use css class instead
 			element.setStyle('opacity', 0);
 			
+			//Change the trash to the same element as the list, to avoid jumpy dragging
+			this.trash.adopt(new Element(this.list.getTag()).adopt(ghost));
+			
 			ghost.effects({duration: this.options.fx.duration, transition: this.options.fx.transition}).start(this.options.fx.from);
 		},
 		onDragComplete: function(element, ghost){
-					
-			ghost.element = element;
-			ghost.options = this.options;
-			ghost.trash = this.trash;
-			
-			pos = element.getPosition();
-			ghost.removeClass('animate');
+
+			var pos = element.getPosition();
 			
 			if(this.options.revert) {
 				this.options.fx.to.top	= pos.y;
@@ -71,19 +65,6 @@ Drag.Sortable = Sortables.extend({
 
 				}.pass([element, ghost], this)
 			}).start(this.options.fx.to);
-		},
-		
-		onOrderChange: function(order){
-			console.log(order);
-				form = $(this.options.form);
-					var success = this.options.msg.success;
-					$(this.options.form).send({
-					data: {
-						action: 'order',
-						ordering: Json.toString(order),
-						_token: $(this.options.form).getElement('input[name="_token"]').getValue()
-					}
-				});	
 		}
 	},
 
@@ -103,10 +84,6 @@ Element.extend({
 
 		if(!this.$sortable) this.$sortable = new Drag.Sortable(this, options);
 		
-		console.group('new Drag.Sortable  ', new Date().toTimeString());
-		console.log(this, this.$sortable);
-		console.groupEnd();
-
 		return this.$sortable;
 
 	}
