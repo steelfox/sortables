@@ -1,0 +1,20 @@
+div.floated {
+	width: 400px;
+	float: left;
+	margin-left: 1em;
+}
+
+ul.myList {
+	margin-left: 20px;
+}
+
+li {
+	cursor: pointer;
+	padding-left: 0;
+	position: relative;
+}
+
+tr > td:first-child {
+	font-size: 14px;
+	cursor: move;
+}
