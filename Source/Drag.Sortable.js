@@ -149,11 +149,11 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 
 });
 
-Drag.Sortable.Adapter.Json = Json.Remote.extend({
+Drag.Sortable.Adapter.Ajax = Ajax.extend({
 
 	initialize: function(options){
 
-		return this.parent(options.url || window.location.path, options);
+		return this.parent(options.url || window.location.pathname, options);
 
 	},
 
@@ -164,15 +164,15 @@ Drag.Sortable.Adapter.Json = Json.Remote.extend({
 	},
 
 	store: function(order){
-		
-		console.log(this.adapter);
-		var store = {};
-		order.each(function(order, index){
-			store[this.elements[order].getProperty('data-id')] = index;
-		}, this);
-		console.log(store);
-		this.adapter.send(store);
 
+		var store = {};
+
+		this.list.getChildren().each(function(item, index){
+			offset = index - item.getProperty('data-order');
+			if(offset !== 0) store[item.getProperty('data-id')] = offset;
+		});
+
+		this.adapter.request(store);
 	}
 
 });
