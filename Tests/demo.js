@@ -21,7 +21,7 @@ window.addEvent('domready', function(){
 		));
 	}
 	
-	$('rows').adopt(tr).sortable({handles: '.handle', adapter: {options: {name: 'table'}}});
-	
+	$('rows').adopt(tr).sortable({handles: '.handle', adapter: {type: 'json', options: {}}});
+
 	//new Sortables(ul);
 });

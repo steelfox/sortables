@@ -123,7 +123,7 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 
 	retrieve: function(order){
 
-		var test = this.list.getChildren().sort(function(a, b){
+		var sorted = this.list.getChildren().sort(function(a, b){
 		
 			order = ['a', 'b'].map(function(key){
 				return this.adapter.get(this[key].getProperty('data-order'));
@@ -133,7 +133,7 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 			
 		}.bind(this));
 
-		this.list.adopt(test);
+		this.list.adopt(sorted);
 
 	},
 	
@@ -144,6 +144,34 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 		}, store = {});
 
 		this.adapter.extend(store);
+
+	}
+
+});
+
+Drag.Sortable.Adapter.Json = Json.Remote.extend({
+
+	initialize: function(options){
+
+		return this.parent(options.url || window.location.path, options);
+
+	},
+
+	retrieve: function(order){
+	
+		// Do nothing yet
+
+	},
+
+	store: function(order){
+		
+		console.log(this.adapter);
+		var store = {};
+		order.each(function(order, index){
+			store[this.elements[order].getProperty('data-id')] = index;
+		}, this);
+		console.log(store);
+		this.adapter.send(store);
 
 	}
 
