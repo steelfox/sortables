@@ -33,7 +33,13 @@ Drag.Sortable = Sortables.extend({
 				opacity: 1
 			}
 		},
-		
+		converter: false,
+		adapter: {
+			type: 'cookie',
+			options: {}
+		},
+
+
 		onDragStart: function(element, ghost){
 		
 			//@TODO Use css class instead
@@ -65,14 +71,27 @@ Drag.Sortable = Sortables.extend({
 
 				}.pass([element, ghost], this)
 			}).start(this.options.fx.to);
+			
+			this.adapter.store.attempt([this.serialize(this.options.converter)], this);
 		}
+		
+	},
+	
+	initialize: function(el, options){
+
+		this.parent(el, options);
+
+		this.list.getChildren().each(function(row, i){
+			row.setProperty('data-order', i);
+		}, this);
+
+		this.adapter = new Drag.Sortable.Adapter[this.options.adapter.type.capitalize()](this.options.adapter.options);
+		this.adapter.retrieve.attempt([this.serialize(this.options.converter)], this);
 	},
 
 	serialize: function(converter){
-		i = 0;
-		return this.list.getChildren().filterByClass('sortable').map(converter || function(el){
-			index = this.elements.indexOf(el);
-			return {id:this.elements[index].getElement('input[name^="id"]').value,ordering:(i++)};
+		return this.list.getChildren().map(converter || function(el){
+			return this.elements.indexOf(el);
 		}, this);
 	}
 
@@ -85,6 +104,46 @@ Element.extend({
 		if(!this.$sortable) this.$sortable = new Drag.Sortable(this, options);
 		
 		return this.$sortable;
+
+	}
+
+});
+
+
+if (!$chk(Drag.Sortable.Adapter)) Drag.Sortable.Adapter = {};
+
+
+Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
+
+	initialize: function(options){
+
+		return this.parent(options.name || 'order', options);
+
+	},
+
+	retrieve: function(order){
+
+		var test = this.list.getChildren().sort(function(a, b){
+		
+			order = ['a', 'b'].map(function(key){
+				return this.adapter.get(this[key].getProperty('data-order'));
+			}, {adapter: this.adapter, a: a, b: b});
+			
+			return order[0] - order[1];
+			
+		}.bind(this));
+
+		this.list.adopt(test);
+
+	},
+	
+	store: function(order){
+		
+		order.each(function(order, index){
+			this[order] = index;
+		}, store = {});
+
+		this.adapter.extend(store);
 
 	}
 

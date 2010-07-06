@@ -23,15 +23,18 @@ if (!$chk(Table)) var Table = {};
 Table.Sortable = Drag.Sortable.extend({
 
 	options: {
+		offset: 2,
 		onStart: function(element){
-		
+
+			var spacing = element.getParent().getParent().getStyle('border-spacing').split(' ')[0].toInt(), 
+				cells = this.ghost.getChildren(), 
+				table = new Element('table', {'style': 'border-spacing: ' + spacing + 'px 0px'}).adopt(this.ghost.getParent());
+			
 			//Change the trash to the same element as the list, to avoid jumpy dragging
-			this.trash.adopt(new Element('table').adopt(this.ghost.getParent()));
-		
-			var cells = this.ghost.getChildren();
+			this.trash.adopt(table);
 			
 			element.getChildren().each(function(cell, i){
-				cells[i].setStyle('width', cell.getSize().scroll.x);
+				cells[i].setStyle('width', cell.getSize().size.x - cell.getStyle('padding-left').toInt() - cell.getStyle('padding-right').toInt());
 			}, this);
 		}
 	}
