@@ -154,9 +154,13 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 
 Drag.Sortable.Adapter.Ajax = Ajax.extend({
 
+	options: {
+		url: window.location.pathname + window.location.search
+	},
+
 	initialize: function(options){
 
-		return this.parent(options.url || window.location.pathname, options);
+		return this.parent(options.url || this.options.url, options);
 
 	},
 
@@ -176,6 +180,27 @@ Drag.Sortable.Adapter.Ajax = Ajax.extend({
 		});
 
 		this.adapter.request(store);
+	}
+
+});
+
+Drag.Sortable.Adapter.Koowa = Drag.Sortable.Adapter.Ajax.extend({
+
+	options: {
+		method: 'post'
+	},
+
+	store: function(order){
+
+		this.list.getChildren().each(function(item, index){
+			offset = index - item.getProperty('data-order');
+			if(offset !== 0) {
+				this.url += '&id[]='+item.getElement('[name^=id]').value;
+				this.options.data += '&order[]='+offset;
+			}
+		}, this.adapter);
+
+		this.adapter.request();
 	}
 
 });
