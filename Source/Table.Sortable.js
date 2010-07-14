@@ -32,18 +32,25 @@ Table.Sortable = Drag.Sortable.extend({
 			
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(table);
-			
+
 			element.getChildren().each(function(cell, i){
 				cells[i].setStyles({
-					width: cell.getSize().size.x - cell.getStyle('padding-left').toInt() - cell.getStyle('padding-right').toInt(),
+					width: this.options._getOffsetSize(cell),
+					height: this.options._getOffsetSize(cell, true),
 					paddingTop: cell.getStyle('padding-top'),
 					paddingRight: cell.getStyle('padding-right'),
 					paddingBottom: cell.getStyle('padding-bottom'),
 					paddingLeft: cell.getStyle('padding-left')
 					/*padding: cell.getStyle('padding') this doesn't work for some reason */
 				});
-				console.log(cell.getStyle('padding'));
 			}, this);
+		},
+		
+		_getOffsetSize: function(cell, vertical){
+			var keys = vertical ? ['y', 'top', 'bottom'] : ['x', 'left', 'right'];
+			return cell.getSize().size[keys[0]] 
+			- cell.getStyle('padding-'+keys[1]).toInt() 
+			- cell.getStyle('padding-'+keys[2]).toInt();
 		}
 	}
 

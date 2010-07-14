@@ -21,4 +21,5 @@ tr > td:first-child {
 
 .scroll td {
 	padding: 2px;
+	height: 25px;
 }
