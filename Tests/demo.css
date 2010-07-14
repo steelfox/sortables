@@ -23,3 +23,5 @@ tr > td:first-child {
 	padding: 2px;
 	height: 25px;
 }
+tr:nth-child(even) 	{ background-color: #F9F9F9; }
+tr:nth-child(odd) 	{ background-color: #FEFEFE; }

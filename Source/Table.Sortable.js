@@ -33,6 +33,9 @@ Table.Sortable = Drag.Sortable.extend({
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(table);
 
+			//Copy the background
+			this.ghost.setStyle('background-color', element.getStyle('background-color'));
+
 			element.getChildren().each(function(cell, i){
 				cells[i].setStyles({
 					width: this.options._getOffsetSize(cell),

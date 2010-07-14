@@ -48,6 +48,9 @@ Drag.Sortable = Sortables.extend({
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(new Element(this.list.getTag()).adopt(ghost));
 			
+			//Give the trash a class so we can style it
+			this.trash.addClass('ghost');
+
 			ghost.effects({duration: this.options.fx.duration, transition: this.options.fx.transition}).start(this.options.fx.from);
 		},
 		onDragComplete: function(element, ghost){
