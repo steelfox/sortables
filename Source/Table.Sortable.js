@@ -28,7 +28,7 @@ Table.Sortable = Drag.Sortable.extend({
 
 			var spacing = element.getParent().getParent().getStyle('border-spacing').split(' ')[0].toInt(), 
 				cells = this.ghost.getChildren(), 
-				table = new Element('table', {'style': 'border-spacing: ' + spacing + 'px 0px'}).adopt(this.ghost.getParent());
+				table = new Element('table', {'class': 'ghost', 'style': 'border-spacing: ' + spacing + 'px 0px'}).adopt(this.ghost.getParent());
 			
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(table);
