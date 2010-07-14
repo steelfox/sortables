@@ -45,6 +45,9 @@ Drag.Sortable = Sortables.extend({
 			//@TODO Use css class instead
 			element.setStyle('opacity', 0);
 			
+			//Saves the element being dragged
+			this.dragged = element;
+			
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(new Element(this.list.getTag()).adopt(ghost));
 			
@@ -194,13 +197,14 @@ Drag.Sortable.Adapter.Koowa = Drag.Sortable.Adapter.Ajax.extend({
 
 		this.list.getChildren().each(function(item, index){
 			offset = index - item.getProperty('data-order');
-			if(offset !== 0) {
-				this.url += '&id[]='+item.getElement('[name^=id]').value;
-				this.options.data += '&order[]='+offset;
+			if(offset !== 0 && item == this.dragged) {
+				this.adapter.url += '&id[]='+item.getElement('[name^=id]').value;
+				if(offset > 0) offset = '+'+offset;
+				this.adapter.options.data += '&ordering='+offset;
+				this.adapter.request();
 			}
-		}, this.adapter);
+		}, this);
 
-		this.adapter.request();
 	}
 
 });
