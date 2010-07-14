@@ -34,7 +34,15 @@ Table.Sortable = Drag.Sortable.extend({
 			this.trash.adopt(table);
 			
 			element.getChildren().each(function(cell, i){
-				cells[i].setStyle('width', cell.getSize().size.x - cell.getStyle('padding-left').toInt() - cell.getStyle('padding-right').toInt());
+				cells[i].setStyles({
+					width: cell.getSize().size.x - cell.getStyle('padding-left').toInt() - cell.getStyle('padding-right').toInt(),
+					paddingTop: cell.getStyle('padding-top'),
+					paddingRight: cell.getStyle('padding-right'),
+					paddingBottom: cell.getStyle('padding-bottom'),
+					paddingLeft: cell.getStyle('padding-left')
+					/*padding: cell.getStyle('padding') this doesn't work for some reason */
+				});
+				console.log(cell.getStyle('padding'));
 			}, this);
 		}
 	}

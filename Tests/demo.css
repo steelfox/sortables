@@ -18,3 +18,7 @@ tr > td:first-child {
 	font-size: 14px;
 	cursor: move;
 }
+
+.scroll td {
+	padding: 2px;
+}
