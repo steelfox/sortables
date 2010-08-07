@@ -1,0 +1,3 @@
+[submodule "Tests/assets/more"]
+	path = Tests/assets/more
+	url = git://github.com/mootools/mootools-more.git
