@@ -23,6 +23,7 @@ Drag.Sortable = new Class({
 	Extends: Sortables,
 
 	options: {
+		revert: true,
 		clone: true,
 		fx: {
 			duration: 300,
@@ -48,38 +49,12 @@ Drag.Sortable = new Class({
 			
 			//Saves the element being dragged
 			this.dragged = element;
-			console.log(element, ghost, this.ghost, {duration: this.options.fx.duration, transition: this.options.fx.transition}, this.options.fx.from);
-			//Change the trash to the same element as the list, to avoid jumpy dragging
-			this.trash.adopt(new Element(this.list[0].get('tag')).adopt(ghost));
 			
-			//Give the trash a class so we can style it
-			this.trash.addClass('ghost');
-
-			this.clone.effects({duration: this.options.fx.duration, transition: this.options.fx.transition}).start(this.options.fx.from);
 		},
 		onComplete: function(element, ghost){
 
-			var pos = element.getPosition();
-			
-			//if(this.options.revert) {
-				this.options.fx.to.top	= pos.y;
-				this.options.fx.to.left	= pos.x;
-			//}
-			
-			ghost.effects({
-				duration: this.options.fx.duration,
-				transition: this.options.fx.transition,
-				onComplete: function(element, ghost){
+			//this.adapter.store.attempt([this.serialize(this.options.converter)], this);
 
-					this.trash.remove();
-
-					//@TODO Use css class instead
-					element.setStyle('opacity', 1);
-
-				}.pass([element, ghost], this)
-			}).start(this.options.fx.to);
-			
-			this.adapter.store.attempt([this.serialize(this.options.converter)], this);
 		}
 		
 	},
@@ -98,7 +73,6 @@ Drag.Sortable = new Class({
 			adapter.retrieve.attempt([this.serialize(this.options.converter)], this);
 			this.adapters[key] = adapter;
 		}, this);
-
 		
 	},
 
@@ -106,10 +80,47 @@ Drag.Sortable = new Class({
 
 		var clone = this.parent(event, element);	
 		
-		console.warn(clone);
+		clone.addClass('clone');
 
 		return clone;
 
+	},
+	
+	start: function(event, element){
+
+		this.parent(event, element);	
+		
+		this.element.setStyle('opacity', 0);
+
+		this.clone.set('morph', {duration: this.options.fx.duration, transition: this.options.fx.transition}).morph(this.options.fx.from);
+
+	},
+
+	reset: function(){
+
+		this.element.set('opacity', this.opacity);
+
+		this.parent();
+
+	},
+
+	end: function(){
+		this.drag.detach();
+
+		if (this.effect){
+			var dim = this.element.getStyles('width', 'height');
+			var pos = this.clone.computePosition(this.element.getPosition(this.clone.offsetParent));
+			this.effect.element = this.clone;
+			this.effect.start({
+				top: pos.top,
+				left: pos.left,
+				width: dim.width,
+				height: dim.height,
+				opacity: this.opacity,
+			}).chain(this.reset.bind(this));
+		} else {
+			this.reset();
+		}
 	},
 
 	serialize: function(converter){
@@ -121,7 +132,7 @@ Drag.Sortable = new Class({
 
 });
 
-Element.extend({
+Element.implement({
 
 	sortable: function(options){
 
