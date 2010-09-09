@@ -1,3 +1,19 @@
+body {
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-align: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	margin: 0;
+}
+body > * {
+	-webkit-box-flex: 1;
+	margin: 8px;
+}
+
 div.floated {
 	width: 400px;
 	float: left;
@@ -10,10 +26,18 @@ div.scroll {
 
 table {
 	border-spacing: 0;
+	text-align: left;
+	width: 100%;
+}
+tbody {
+	border: 1px whitesmoke solid;
 }
 
 ul.myList {
-	margin-left: 20px;
+	margin-left: 0px;
+	margin-top: 0;
+	margin-bottom: 0;
+	padding: 0;
 }
 
 li {
@@ -31,5 +55,5 @@ tr > td:first-child {
 	padding: 2px;
 	height: 25px;
 }
-tr:nth-child(even) 	{ background-color: #999; color: white}
+tr:nth-child(even) 	{ background-color: #F1F1F1; }
 tr:nth-child(odd) 	{ background-color: #FEFEFE; }

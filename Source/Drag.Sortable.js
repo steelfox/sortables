@@ -51,9 +51,11 @@ Drag.Sortable = new Class({
 			this.dragged = element;
 			
 		},
-		onComplete: function(element, ghost){
+		onComplete: function(element){
 
-			//this.adapter.store.attempt([this.serialize(this.options.converter)], this);
+			var key = this.lists.indexOf(this.list);
+
+			this.adapters[key].store(this, this.serialize(key));
 
 		}
 		
@@ -70,7 +72,7 @@ Drag.Sortable = new Class({
 			}, this);
 			
 			var adapter = new Drag.Sortable.Adapter[this.options.adapter.type.capitalize()](this.options.adapter.options);
-			adapter.retrieve.attempt([this.serialize(this.options.converter)], this);
+			adapter.retrieve(this, this.serialize(this.options.converter));
 			this.adapters[key] = adapter;
 		}, this);
 		
@@ -123,11 +125,17 @@ Drag.Sortable = new Class({
 		}
 	},
 
-	serialize: function(converter){
-		//@TODO add support for lists asap
-		return this.lists[0].getChildren().map(converter || function(el){
-			return this.elements.indexOf(el);
+	serialize: function(){
+		var params = Array.link(arguments, {modifier: Function.type, index: $defined});
+		var serial = this.lists.map(function(list){
+			return list.getChildren().map(params.modifier || function(element){
+				return this.elements.indexOf(element);
+			}, this);
 		}, this);
+
+		var index = params.index;
+		if (this.lists.length == 1) index = 0;
+		return $chk(index) && index >= 0 && index < this.lists.length ? serial[index] : serial;
 	}
 
 });
@@ -158,13 +166,13 @@ Drag.Sortable.Adapter.Cookie = new Class({
 
 	},
 
-	retrieve: function(order){
-		this.lists.each(function(list){
+	retrieve: function(instance, order){
+		instance.lists.each(function(list){
 			var sorted = list.getChildren().sort(function(a, b){
 			
 				order = ['a', 'b'].map(function(key){
 					return this.adapter.get(this[key].getProperty('data-order'));
-				}, {adapter: this.adapter, a: a, b: b});
+				}, {adapter: this, a: a, b: b});
 				
 				return order[0] - order[1];
 				
@@ -175,13 +183,14 @@ Drag.Sortable.Adapter.Cookie = new Class({
 
 	},
 	
-	store: function(order){
+	store: function(instance, order){
 		
 		order.each(function(order, index){
 			this[order] = index;
 		}, store = {});
 
-		this.adapter.extend(store);
+		this.hash.extend(store);
+		this.save();
 
 	}
 

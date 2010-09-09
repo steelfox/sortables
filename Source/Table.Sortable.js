@@ -25,20 +25,16 @@ Table.Sortable = new Class({
 	Extends: Drag.Sortable,
 
 	options: {
-		offset: 2,
+
 		zebra: true,
-		
+		constrain: true,
+
+	
 		onSort: function(){
 
 			this.clone.inject(this.element, 'before');
 			this.ghost.inject(this.element, 'after');
 	
-		},
-		
-		onComplete: function(){
-
-			this.ghost.destroy();
-
 		}
 	},
 
@@ -46,9 +42,38 @@ Table.Sortable = new Class({
 
 		this.parent(event, element);
 
+		var spacing = this.element.getParents('table')[0].getStyle('border-spacing').split(' ')[0].toInt(), 
+			cells = this.clone.getChildren();
+
+		this.element.getChildren().each(function(cell, i){
+			cells[i].setStyles({
+				width: this._getOffsetSize(cell),
+				height: this._getOffsetSize(cell, true),
+				paddingTop: cell.getStyle('padding-top'),
+				paddingRight: cell.getStyle('padding-right'),
+				paddingBottom: cell.getStyle('padding-bottom'),
+				paddingLeft: cell.getStyle('padding-left')
+			});
+		}, this);
+
 		this.ghost = this.getClone(new Event, element);
 		this.ghost.inject(this.element, 'after');
 
+	},
+
+	reset: function(){
+
+		this.parent();
+
+		this.ghost.destroy();
+
+	},
+
+	_getOffsetSize: function(cell, vertical){
+		var keys = vertical ? ['y', 'top', 'bottom'] : ['x', 'left', 'right'];
+		return cell.getSize()[keys[0]] 
+		- cell.getStyle('padding-'+keys[1]).toInt() 
+		- cell.getStyle('padding-'+keys[2]).toInt();
 	},
 
 });

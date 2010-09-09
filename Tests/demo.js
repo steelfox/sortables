@@ -11,13 +11,14 @@ window.addEvent('domready', function(){
 	}).inject('sortables').adopt(li).sortable();
 	
 	// We autogenerate a table on the fly
-	var tr = [];
+	var tr = [], chars = 'abcdefghijklmnopgrstuvwxyz'.split('');
 	
 	for (i = 1; i <= 10; i++) {
 		tr.push(new Element('tr', {'data-id': i}).adopt(
 			new Element('td', {'class': 'handle', 'html': '&#9776;'}),
 			new Element('td').adopt(new Element('input', {type: 'checkbox'})),
-			new Element('td', {text: 'Item #'+i})
+			new Element('td', {text: 'Item #'+i}),
+			new Element('td', {text: chars.shift()})
 		));
 	}
 	
