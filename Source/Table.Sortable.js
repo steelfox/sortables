@@ -59,11 +59,11 @@ Table.Sortable = Drag.Sortable.extend({
 
 });
 
-Element.extend({
+Element.implement({
 
 	sortable: function(options){
 
-		if(!this.$sortable) this.$sortable = this.getTag() == 'tbody' ? new Table.Sortable(this, options) : new Drag.Sortable(this, options);
+		if(!this.$sortable) this.$sortable = this.get('tag') == 'tbody' ? new Table.Sortable(this, options) : new Drag.Sortable(this, options);
 		
 		return this.$sortable;
 
