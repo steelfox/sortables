@@ -210,41 +210,42 @@ Drag.Sortable.Adapter.Request = new Class({
 
 	},
 
-	retrieve: function(order){
+	retrieve: function(instance, order){
 	
 		// Do nothing yet
 
 	},
 
-	store: function(order){
+	store: function(instance, order){
 
-		var store = {};
-
-		this.list[0].getChildren().each(function(item, index){
+		if(typeof this.options.data != 'object') this.options.data = {};
+		instance.lists[0].getChildren().each(function(item, index){
 			offset = index - item.getProperty('data-order');
-			if(offset !== 0) store[item.getProperty('data-id')] = offset;
-		});
+			if(offset !== 0) this.options.data[item.getProperty('data-id')] = offset;
+		}, this);
 
-		this.adapter.request(store);
+		this.send();
 	}
 
 });
 
-Drag.Sortable.Adapter.Koowa = Drag.Sortable.Adapter.Request.extend({
+Drag.Sortable.Adapter.Koowa = new Class({
+
+	Extends: Drag.Sortable.Adapter.Request,
 
 	options: {
 		method: 'post'
 	},
 
-	store: function(order){
+	store: function(instance, order){
 
-		this.list[0].getChildren().each(function(item, index){
+		instance.lists[0].getChildren().each(function(item, index){
 			offset = index - item.getProperty('data-order');
-			if(offset !== 0 && item == this.dragged) {
-				this.adapter.url += '&id[]='+item.getElement('[name^=id]').value;
+			if(offset !== 0 && item == instance.dragged) {
+				this.options.url += '&id[]='+item.getElement('[name^=id]').value;
 				if(offset > 0) offset = '+'+offset;
-				this.adapter.options.data += '&ordering='+offset;
-				this.adapter.request();
+				this.options.data += '&ordering='+offset;
+				this.send();
 			}
 		}, this);
 
