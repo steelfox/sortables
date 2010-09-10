@@ -234,18 +234,24 @@ Drag.Sortable.Adapter.Koowa = new Class({
 	Extends: Drag.Sortable.Adapter.Request,
 
 	options: {
-		method: 'post'
+		method: 'post',
+		key: 'ordering',
+		offset: 'relative'
 	},
 
 	store: function(instance, order){
 
+		var backup = this.options.url;
 		instance.lists[0].getChildren().each(function(item, index){
-			offset = index - item.getProperty('data-order');
-			if(offset !== 0 && item == instance.dragged) {
-				this.options.url += '&id[]='+item.getElement('[name^=id]').value;
-				if(offset > 0) offset = '+'+offset;
-				this.options.data += '&ordering='+offset;
+			if(this.options.offset == 'relative') offset = index - item.getProperty('data-order');
+			if(this.options.offset == 'absolute') offset = instance.elements.indexOf(item);
+
+			if(/*offset !== 0 && */item == instance.dragged) {
+				this.options.url += '&id='+item.getElement('[name^=id]').value;
+				//if(this.options.offset == 'relative' && offset > 0) offset = '+'+offset;
+				this.options.data[this.options.key] = offset;
 				this.send();
+				this.options.url = backup;
 			}
 		}, this);
 
