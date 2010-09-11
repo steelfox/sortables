@@ -41,16 +41,16 @@ Drag.Sortable = Sortables.extend({
 
 
 		onDragStart: function(element, ghost){
-		
+
 			//@TODO Use css class instead
 			element.setStyle('opacity', 0);
-			
+
 			//Saves the element being dragged
 			this.dragged = element;
-			
+
 			//Change the trash to the same element as the list, to avoid jumpy dragging
 			this.trash.adopt(new Element(this.list.getTag()).adopt(ghost));
-			
+
 			//Give the trash a class so we can style it
 			this.trash.addClass('ghost');
 
@@ -59,12 +59,12 @@ Drag.Sortable = Sortables.extend({
 		onDragComplete: function(element, ghost){
 
 			var pos = element.getPosition();
-			
+
 			if(this.options.revert) {
 				this.options.fx.to.top	= pos.y;
 				this.options.fx.to.left	= pos.x;
 			}
-			
+
 			ghost.effects({
 				duration: this.options.fx.duration,
 				transition: this.options.fx.transition,
@@ -77,12 +77,12 @@ Drag.Sortable = Sortables.extend({
 
 				}.pass([element, ghost], this)
 			}).start(this.options.fx.to);
-			
+
 			this.adapter.store.attempt([this.serialize(this.options.converter)], this);
 		}
-		
+
 	},
-	
+
 	initialize: function(el, options){
 
 		this.parent(el, options);
@@ -108,7 +108,7 @@ Element.extend({
 	sortable: function(options){
 
 		if(!this.$sortable) this.$sortable = new Drag.Sortable(this, options);
-		
+
 		return this.$sortable;
 
 	}
@@ -130,21 +130,21 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 	retrieve: function(order){
 
 		var sorted = this.list.getChildren().sort(function(a, b){
-		
+
 			order = ['a', 'b'].map(function(key){
 				return this.adapter.get(this[key].getProperty('data-order'));
 			}, {adapter: this.adapter, a: a, b: b});
-			
+
 			return order[0] - order[1];
-			
+
 		}.bind(this));
 
 		this.list.adopt(sorted);
 
 	},
-	
+
 	store: function(order){
-		
+
 		order.each(function(order, index){
 			this[order] = index;
 		}, store = {});
@@ -168,7 +168,7 @@ Drag.Sortable.Adapter.Ajax = Ajax.extend({
 	},
 
 	retrieve: function(order){
-	
+
 		// Do nothing yet
 
 	},
@@ -190,20 +190,26 @@ Drag.Sortable.Adapter.Ajax = Ajax.extend({
 Drag.Sortable.Adapter.Koowa = Drag.Sortable.Adapter.Ajax.extend({
 
 	options: {
-		method: 'post'
+		method: 'post',
+		key: 'ordering',
+		offset: 'relative'
 	},
 
 	store: function(order){
 
+		var backup = this.adapter.url, instance = this;
 		this.list.getChildren().each(function(item, index){
-			offset = index - item.getProperty('data-order');
-			if(offset !== 0 && item == this.dragged) {
-				this.adapter.url += '&id[]='+item.getElement('[name^=id]').value;
-				if(offset > 0) offset = '+'+offset;
-				this.adapter.options.data += '&ordering='+offset;
-				this.adapter.request();
+			if(this.options.offset == 'relative') offset = index - item.getProperty('data-order');
+			if(this.options.offset == 'absolute') offset = instance.elements.indexOf(item);
+
+			if(/*offset !== 0 && */item == instance.dragged) {
+				this.url += '&id='+item.getElement('[name^=id]').value;
+				//if(this.options.offset == 'relative' && offset > 0) offset = '+'+offset;
+				this.options.data[this.options.key] = offset;
+				this.request();
+				this.url = backup;
 			}
-		}, this);
+		}, this.adapter);
 
 	}
 
