@@ -85,6 +85,9 @@ Drag.Sortable = Sortables.extend({
 
 	initialize: function(el, options){
 
+		//MT 1.2 compatability
+		if(options && options.handle) options.handles = options.handle;
+
 		this.parent(el, options);
 
 		this.list.getChildren().each(function(row, i){
@@ -158,7 +161,19 @@ Drag.Sortable.Adapter.Cookie = Hash.Cookie.extend({
 Drag.Sortable.Adapter.Ajax = Ajax.extend({
 
 	options: {
-		url: window.location.pathname + window.location.search
+		url: window.location.pathname + window.location.search,
+		saveclass: 'saving',
+		errorclass: 'error',
+
+		onRequest: function(){
+			this.target.addClass(this.options.saveclass).removeClass(this.options.errorclass);
+		},
+		onFailure: function(){
+			this.target.removeClass(this.options.saveclass).addClass(this.options.errorclass);
+		},
+		onComplete: function(){
+			this.target.removeClass(this.options.saveclass).removeClass(this.options.errorclass);
+		}
 	},
 
 	initialize: function(options){
@@ -182,6 +197,7 @@ Drag.Sortable.Adapter.Ajax = Ajax.extend({
 			if(offset !== 0) store[item.getProperty('data-id')] = offset;
 		});
 
+		this.adapter.target = this.dragged;
 		this.adapter.request(store);
 	}
 
@@ -197,6 +213,7 @@ Drag.Sortable.Adapter.Koowa = Drag.Sortable.Adapter.Ajax.extend({
 
 	store: function(order){
 
+		this.adapter.target = this.dragged;
 		var backup = this.adapter.url, instance = this;
 		this.list.getChildren().each(function(item, index){
 			if(this.options.offset == 'relative') offset = index - item.getProperty('data-order');
