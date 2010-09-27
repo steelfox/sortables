@@ -39,24 +39,23 @@ Table.Sortable = new Class({
 		},
 
 		onComplete: function(){
-        
-                if(this.options.numcolumn) {
-                        
-                        (function(){
-                                var numbers = [];
-                                this.list.getElements(this.options.numcolumn).each(function(row){
-                                        numbers.push(row.get('text').toInt());
-                                }, this);
-                                numbers.sort(function(a, b){
-                                        return a > b;
-                                });
-                                this.list.getChildren().each(function(row, i){
-                                        row.getElement(this.options.numcolumn).set('text', numbers[i]);
-                                }, this);
-                        }.bind(this)).delay(400);
-                }
-        
-        }
+
+			if(this.options.numcolumn) {
+				(function(){
+					var numbers = [];
+					this.list.getElements(this.options.numcolumn).each(function(row){
+						numbers.push(row.get('text').toInt());
+					}, this);
+					numbers.sort(function(a, b){
+						return a > b;
+					});
+					this.list.getChildren().each(function(row, i){
+						row.getElement(this.options.numcolumn).set('text', numbers[i]);
+					}, this);
+				}.bind(this)).delay(400);
+			}
+
+		}
 	},
 
 	start: function(event, element){
@@ -95,7 +94,7 @@ Table.Sortable = new Class({
 		return cell.getSize()[keys[0]] 
 		- cell.getStyle('padding-'+keys[1]).toInt() 
 		- cell.getStyle('padding-'+keys[2]).toInt();
-	},
+	}
 
 });
 
