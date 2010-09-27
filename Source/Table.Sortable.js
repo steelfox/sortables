@@ -28,6 +28,7 @@ Table.Sortable = new Class({
 
 		zebra: true,
 		constrain: true,
+		numcolumn: false,
 
 	
 		onSort: function(){
@@ -35,7 +36,27 @@ Table.Sortable = new Class({
 			this.clone.inject(this.element, 'before');
 			this.ghost.inject(this.element, 'after');
 	
-		}
+		},
+
+		onComplete: function(){
+        
+                if(this.options.numcolumn) {
+                        
+                        (function(){
+                                var numbers = [];
+                                this.list.getElements(this.options.numcolumn).each(function(row){
+                                        numbers.push(row.get('text').toInt());
+                                }, this);
+                                numbers.sort(function(a, b){
+                                        return a > b;
+                                });
+                                this.list.getChildren().each(function(row, i){
+                                        row.getElement(this.options.numcolumn).set('text', numbers[i]);
+                                }, this);
+                        }.bind(this)).delay(400);
+                }
+        
+        }
 	},
 
 	start: function(event, element){
