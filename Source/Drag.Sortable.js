@@ -201,7 +201,18 @@ Drag.Sortable.Adapter.Request = new Class({
 	Extends: Request,
 
 	options: {
-		url: window.location.pathname + window.location.search
+		url: window.location.pathname + window.location.search,
+		saveclass: 'saving',
+		errorclass: 'error',
+		onRequest: function(){
+			this.target.addClass(this.options.saveclass).removeClass(this.options.errorclass);
+		},
+		onFailure: function(){
+			this.target.removeClass(this.options.saveclass).addClass(this.options.errorclass);
+		},
+		onComplete: function(){
+			this.target.removeClass(this.options.saveclass).removeClass(this.options.errorclass);
+		}
 	},
 
 	initialize: function(options){
@@ -223,7 +234,7 @@ Drag.Sortable.Adapter.Request = new Class({
 			offset = index - item.getProperty('data-order');
 			if(offset !== 0) this.options.data[item.getProperty('data-id')] = offset;
 		}, this);
-
+		this.target = instance.dragged;
 		this.send();
 	}
 
@@ -240,6 +251,7 @@ Drag.Sortable.Adapter.Koowa = new Class({
 	},
 
 	store: function(instance, order){
+		this.target = instance.dragged;
 
 		var backup = this.options.url;
 		instance.lists[0].getChildren().each(function(item, index){
