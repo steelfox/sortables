@@ -24,6 +24,7 @@ Table.Sortable = Drag.Sortable.extend({
 
 	options: {
 		offset: 2,
+		numcolumn: false,
 		onStart: function(element){
 
 			var spacing = element.getParent().getParent().getStyle('border-spacing').split(' ')[0].toInt(), 
@@ -48,6 +49,26 @@ Table.Sortable = Drag.Sortable.extend({
 				});
 			}, this);
 		},
+		
+		onComplete: function(){
+        
+                if(this.options.numcolumn) {
+                        
+                        (function(){
+                                var numbers = [];
+                                this.list.getElements(this.options.numcolumn).each(function(row){
+                                        numbers.push(row.getText().toInt());
+                                }, this);
+                                numbers.sort(function(a, b){
+                                        return a > b;
+                                });
+                                this.list.getChildren().each(function(row, i){
+                                        row.getElement(this.options.numcolumn).setText(numbers[i]);
+                                }, this);
+                        }.bind(this)).delay(400);
+                }
+        
+        },
 		
 		_getOffsetSize: function(cell, vertical){
 			var keys = vertical ? ['y', 'top', 'bottom'] : ['x', 'left', 'right'];
