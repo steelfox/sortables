@@ -46,10 +46,10 @@ Drag.Sortable = new Class({
 
 			//@TODO Use css class instead
 			element.setStyle('opacity', 0);
-			
+
 			//Saves the element being dragged
 			this.dragged = element;
-			
+
 		},
 		onComplete: function(element){
 
@@ -58,7 +58,7 @@ Drag.Sortable = new Class({
 			this.adapters[key].store(this, this.serialize(key));
 
 		}
-		
+
 	},
 
 	initialize: function(lists, options){
@@ -70,28 +70,28 @@ Drag.Sortable = new Class({
 			list.getChildren().each(function(row, i){
 				row.setProperty('data-order', i);
 			}, this);
-			
+
 			var adapter = new Drag.Sortable.Adapter[this.options.adapter.type.capitalize()](this.options.adapter.options);
 			adapter.retrieve(this, this.serialize(this.options.converter));
 			this.adapters[key] = adapter;
 		}, this);
-		
+
 	},
 
 	getClone: function(event, element){
 
 		var clone = this.parent(event, element);	
-		
+
 		clone.addClass('clone');
 
 		return clone;
 
 	},
-	
+
 	start: function(event, element){
 
 		this.parent(event, element);	
-		
+
 		this.element.setStyle('opacity', 0);
 
 		this.clone.set('morph', {duration: this.options.fx.duration, transition: this.options.fx.transition}).morph(this.options.fx.from);
@@ -118,7 +118,7 @@ Drag.Sortable = new Class({
 				left: pos.left,
 				width: dim.width,
 				height: dim.height,
-				opacity: this.opacity,
+				opacity: this.opacity
 			}).chain(this.reset.bind(this));
 		} else {
 			this.reset();
@@ -145,7 +145,7 @@ Element.implement({
 	sortable: function(options){
 
 		if(!this.$sortable) this.$sortable = new Drag.Sortable(this, options);
-		
+
 		return this.$sortable;
 
 	}
@@ -157,7 +157,7 @@ if (!$chk(Drag.Sortable.Adapter)) Drag.Sortable.Adapter = {};
 
 
 Drag.Sortable.Adapter.Cookie = new Class({
-	
+
 	Extends: Hash.Cookie,
 
 	initialize: function(options){
@@ -169,22 +169,22 @@ Drag.Sortable.Adapter.Cookie = new Class({
 	retrieve: function(instance, order){
 		instance.lists.each(function(list){
 			var sorted = list.getChildren().sort(function(a, b){
-			
+
 				order = ['a', 'b'].map(function(key){
 					return this.adapter.get(this[key].getProperty('data-order'));
 				}, {adapter: this, a: a, b: b});
-				
+
 				return order[0] - order[1];
-				
+
 			}.bind(this));
-	
+
 			list.adopt(sorted);
 		}, this);
 
 	},
-	
+
 	store: function(instance, order){
-		
+
 		order.each(function(order, index){
 			this[order] = index;
 		}, store = {});
@@ -204,14 +204,15 @@ Drag.Sortable.Adapter.Request = new Class({
 		url: window.location.pathname + window.location.search,
 		saveclass: 'saving',
 		errorclass: 'error',
+
 		onRequest: function(){
-			this.target.addClass(this.options.saveclass).removeClass(this.options.errorclass);
+			this.instance.dragged.addClass(this.options.saveclass).removeClass(this.options.errorclass);
 		},
 		onFailure: function(){
-			this.target.removeClass(this.options.saveclass).addClass(this.options.errorclass);
+			this.instance.dragged.removeClass(this.options.saveclass).addClass(this.options.errorclass);
 		},
 		onComplete: function(){
-			this.target.removeClass(this.options.saveclass).removeClass(this.options.errorclass);
+			this.instance.dragged.removeClass(this.options.saveclass).removeClass(this.options.errorclass);
 		}
 	},
 
@@ -222,8 +223,8 @@ Drag.Sortable.Adapter.Request = new Class({
 	},
 
 	retrieve: function(instance, order){
-	
-		// Do nothing yet
+
+		this.instance = instance;
 
 	},
 
@@ -234,7 +235,7 @@ Drag.Sortable.Adapter.Request = new Class({
 			offset = index - item.getProperty('data-order');
 			if(offset !== 0) this.options.data[item.getProperty('data-id')] = offset;
 		}, this);
-		this.target = instance.dragged;
+
 		this.send();
 	}
 
@@ -251,7 +252,6 @@ Drag.Sortable.Adapter.Koowa = new Class({
 	},
 
 	store: function(instance, order){
-		this.target = instance.dragged;
 
 		var backup = this.options.url;
 		instance.lists[0].getChildren().each(function(item, index){
