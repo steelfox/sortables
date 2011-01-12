@@ -30,17 +30,22 @@ Table.Sortable = new Class({
 		constrain: true,
 		numcolumn: false,
 
-	
+
 		onSort: function(){
 
 			this.clone.inject(this.element, 'before');
 			this.ghost.inject(this.element, 'after');
-	
+
 		},
 
 		onComplete: function(){
 
+			var key = this.lists.indexOf(this.list);
+
+			this.adapters[key].store(this, this.serialize(key));
+
 			if(this.options.numcolumn) {
+
 				(function(){
 					var numbers = [];
 					this.list.getElements(this.options.numcolumn).each(function(row){
@@ -50,7 +55,13 @@ Table.Sortable = new Class({
 						return a > b;
 					});
 					this.list.getChildren().each(function(row, i){
-						row.getElement(this.options.numcolumn).set('text', numbers[i]);
+						var numcol = row.getElement(this.options.numcolumn);
+						if(numcol) numcol.set('text', numbers[i]);
+						if(i % 2) {
+							row.removeClass('row0').addClass('row1');
+						} else {
+							row.removeClass('row1').addClass('row0');
+						}
 					}, this);
 				}.bind(this)).delay(400);
 			}
