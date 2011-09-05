@@ -265,7 +265,7 @@ Drag.Sortable.Adapter.Koowa = new Class({
 				this.send();
 				this.options.url = backup;
 			}
-		}, this);
+		}, this.adapter);
 
 	}
 
